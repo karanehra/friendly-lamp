@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,7 +10,10 @@ public class UserModel {
   @Id
   private String id;
 
+  @NotBlank
   public String firstName;
+
+  @NotBlank
   public String lastName;
 
   public UserModel() {

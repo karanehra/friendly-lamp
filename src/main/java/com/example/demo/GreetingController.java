@@ -29,9 +29,9 @@ public class GreetingController {
   }
 
   @GetMapping("/test")
-  public void getUsers() {
+  public UserModel getUsers() {
     repository.deleteAll();
-    repository.save(new UserModel("Karan", "nehra"));
+    return repository.save(new UserModel("Karan", null));
   }
 
   @GetMapping("/testget")
