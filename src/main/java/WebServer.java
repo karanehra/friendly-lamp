@@ -37,8 +37,9 @@ public class WebServer {
         List<Document> articleDocuments = new ArrayList<>();
 
         for (SyndEntry article : articles) {
-            Document doc = new Document("title",article.getTitle()).append("description", article.getDescription().getValue());
+            Document doc = new Document("title", article.getTitle()).append("description", article.getDescription().getValue()).append("createdAt", article.getPublishedDate());
             articleDocuments.add(doc);
+            System.out.println(article.getPublishedDate());
         }
         collection.insertMany(articleDocuments);
 
