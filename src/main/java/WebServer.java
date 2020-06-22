@@ -9,6 +9,7 @@ import com.rometools.rome.io.XmlReader;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import models.Article;
 import org.bson.Document;
 
 import java.io.IOException;
@@ -37,8 +38,13 @@ public class WebServer {
         List<Document> articleDocuments = new ArrayList<>();
 
         for (SyndEntry article : articles) {
-            Document doc = new Document("title", article.getTitle()).append("description", article.getDescription().getValue()).append("createdAt", article.getPublishedDate());
-            articleDocuments.add(doc);
+            Article articleData = new Article(
+                    article.getTitle(),
+                    article.getDescription().getValue(),
+                    article.getPublishedDate(),
+                    article.getLink()
+            );
+            articleDocuments.add(articleData.getDocument());
             System.out.println(article.getPublishedDate());
         }
         collection.insertMany(articleDocuments);
