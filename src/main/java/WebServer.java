@@ -45,7 +45,8 @@ public class WebServer {
                     article.getLink()
             );
             articleDocuments.add(articleData.getDocument());
-            System.out.println(article.getPublishedDate());
+//            System.out.println(article.getPublishedDate());
+            articleData.printMembers();
         }
         collection.insertMany(articleDocuments);
 
