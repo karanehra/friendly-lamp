@@ -23,32 +23,35 @@ public class WebServer {
     public static void main(String[] args) throws Exception {
         System.out.println("Hello");
 
-        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase database = mongoClient.getDatabase("testdb");
-        MongoCollection<Document> collection = database.getCollection("articlesnew");
-        System.out.println(collection.countDocuments());
+        RunnableMethods tasks = new RunnableMethods();
 
-        URL feedUrl = new URL("https://timesofindia.indiatimes.com/rssfeedstopstories.cms");
+        tasks.task.run();
 
-        SyndFeedInput feedInput = new SyndFeedInput();
-        SyndFeed feed = feedInput.build(new XmlReader(feedUrl));
-
-        List<SyndEntry> articles = feed.getEntries();
-
-        List<Document> articleDocuments = new ArrayList<>();
-
-        for (SyndEntry article : articles) {
-            Article articleData = new Article(
-                    article.getTitle(),
-                    article.getDescription().getValue(),
-                    article.getPublishedDate(),
-                    article.getLink()
-            );
-            articleDocuments.add(articleData.getDocument());
-//            System.out.println(article.getPublishedDate());
-            articleData.printMembers();
-        }
-        collection.insertMany(articleDocuments);
+//        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+//        MongoDatabase database = mongoClient.getDatabase("testdb");
+//        MongoCollection<Document> collection = database.getCollection("articlesnew");
+//        System.out.println(collection.countDocuments());
+//
+//        URL feedUrl = new URL("https://timesofindia.indiatimes.com/rssfeedstopstories.cms");
+//
+//        SyndFeedInput feedInput = new SyndFeedInput();
+//        SyndFeed feed = feedInput.build(new XmlReader(feedUrl));
+//
+//        List<SyndEntry> articles = feed.getEntries();
+//
+//        List<Document> articleDocuments = new ArrayList<>();
+//
+//        for (SyndEntry article : articles) {
+//            Article articleData = new Article(
+//                    article.getTitle(),
+//                    article.getDescription().getValue(),
+//                    article.getPublishedDate(),
+//                    article.getLink()
+//            );
+//            articleDocuments.add(articleData.getDocument());
+//            articleData.printMembers();
+//        }
+//        collection.insertMany(articleDocuments);
 
     }
 
@@ -68,5 +71,17 @@ public class WebServer {
             os.write(response);
             os.close();
         }
+    }
+
+    static class RunnableMethods {
+        public Runnable task = () -> {
+            String threadName = Thread.currentThread().getName();
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Hello " + threadName);
+        };
     }
 }

@@ -61,7 +61,5 @@ public class Article {
         Field[] members = this.getClass().getDeclaredFields();
 //        System.out.println(Arrays.toString(members));
         System.out.println(members[0].getName());
-        members[0].setAccessible(true);
-        System.out.println(this.getClass().getField(members[0].getName()));
     }
 }
