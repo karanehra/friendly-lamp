@@ -18,6 +18,10 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class WebServer {
     public static void main(String[] args) throws Exception {
@@ -25,7 +29,8 @@ public class WebServer {
 
         RunnableMethods tasks = new RunnableMethods();
 
-        tasks.task.run();
+        ExecutorService serv = Executors.newSingleThreadExecutor();
+        serv.submit(tasks.task);
 
 //        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
 //        MongoDatabase database = mongoClient.getDatabase("testdb");
@@ -77,11 +82,20 @@ public class WebServer {
         public Runnable task = () -> {
             String threadName = Thread.currentThread().getName();
             try {
-                Thread.sleep(10000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             System.out.println("Hello " + threadName);
         };
+        public Callable<String> task2 = () -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                return "Hellooooooo";
+            }
+            catch (InterruptedException e) {
+                throw new IllegalStateException("task interrupted", e);
+            }
+        }
     }
 }
