@@ -1,7 +1,4 @@
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.SyndFeedInput;
@@ -18,45 +15,57 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class WebServer {
     public static void main(String[] args) throws Exception {
         System.out.println("Hello");
 
-        RunnableMethods tasks = new RunnableMethods();
+//        RunnableMethods tasks = new RunnableMethods();
+//
+//        ExecutorService serv = Executors.newSingleThreadExecutor();
+//
+//        serv.submit(tasks.task);
+//        serv.submit(tasks.task);
+//        serv.submit(tasks.task);
+//
+//        Future<String> fut = serv.submit(tasks.task2);
+//        System.out.println(fut.get());
 
-        ExecutorService serv = Executors.newSingleThreadExecutor();
-        serv.submit(tasks.task);
+        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+        MongoDatabase database = mongoClient.getDatabase("testdb");
+        MongoCollection<Document> feeds = database.getCollection("feeds");
+        MongoCollection<Document> articlesColl = database.getCollection("articlesnew");
+        MongoCursor<Document> feedCursor = feeds.find().iterator();
 
-//        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-//        MongoDatabase database = mongoClient.getDatabase("testdb");
-//        MongoCollection<Document> collection = database.getCollection("articlesnew");
-//        System.out.println(collection.countDocuments());
-//
-//        URL feedUrl = new URL("https://timesofindia.indiatimes.com/rssfeedstopstories.cms");
-//
-//        SyndFeedInput feedInput = new SyndFeedInput();
-//        SyndFeed feed = feedInput.build(new XmlReader(feedUrl));
-//
-//        List<SyndEntry> articles = feed.getEntries();
-//
-//        List<Document> articleDocuments = new ArrayList<>();
-//
-//        for (SyndEntry article : articles) {
-//            Article articleData = new Article(
-//                    article.getTitle(),
-//                    article.getDescription().getValue(),
-//                    article.getPublishedDate(),
-//                    article.getLink()
-//            );
-//            articleDocuments.add(articleData.getDocument());
-//            articleData.printMembers();
-//        }
-//        collection.insertMany(articleDocuments);
+        List<Document> articleDocuments = new ArrayList<>();
+        int i = 20;
+        while(i>0){
+            System.out.println();
+            URL feedUrl = new URL(feedCursor.next().getString("url"));
+
+            SyndFeedInput feedInput = new SyndFeedInput();
+            try {
+                SyndFeed feed = feedInput.build(new XmlReader(feedUrl));
+
+                List<SyndEntry> articles = feed.getEntries();
+
+                for (SyndEntry article : articles) {
+                    Article articleData = new Article(
+                            article.getTitle(),
+                            article.getDescription().getValue(),
+                            article.getPublishedDate(),
+                            article.getLink()
+                    );
+                    articleDocuments.add(articleData.getDocument());
+                }
+                i--;
+            } catch (Exception e){
+                System.out.println(e.toString());
+            }
+        }
+        articlesColl.insertMany(articleDocuments);
+        feedCursor.close();
 
     }
 
@@ -96,6 +105,6 @@ public class WebServer {
             catch (InterruptedException e) {
                 throw new IllegalStateException("task interrupted", e);
             }
-        }
+        };
     }
 }
